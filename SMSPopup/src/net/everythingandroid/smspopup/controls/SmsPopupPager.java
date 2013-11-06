@@ -60,6 +60,7 @@ public class SmsPopupPager extends ViewPager implements OnPageChangeListener {
         mGestureDetector = new GestureDetector(mContext, listener);
     }
 
+
     /**
      * Add a message and its view to the end of the list of messages.
      *

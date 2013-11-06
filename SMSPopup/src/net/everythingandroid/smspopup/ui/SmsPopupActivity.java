@@ -1,6 +1,7 @@
 package net.everythingandroid.smspopup.ui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.everythingandroid.smspopup.BuildConfig;
@@ -986,6 +987,25 @@ public class SmsPopupActivity extends FragmentActivity implements SmsPopupButton
     }
 
     /**
+     * Close the message window/popup, and mark all messages read
+     */
+    private void closeAllMessages() {
+        ArrayList<Bundle> allMessages = new ArrayList<Bundle>();
+        Iterator messages = smsPopupPager.getMessages().iterator();
+        while(messages.hasNext()) {
+            allMessages.add(((SmsMmsMessage)messages.next()).toBundle());
+        }
+
+        Intent i = new Intent(getApplicationContext(), SmsPopupUtilsService.class);
+        i.setAction(SmsPopupUtilsService.ACTION_MARK_ALL_MESSAGES_READ);
+        i.putExtra("messages", allMessages);
+
+        WakefulIntentService.sendWakefulWork(getApplicationContext(), i);
+
+        myFinish();
+    }
+
+    /**
      * Reply to the current message, start the reply intent
      */
     private void replyToMessage(final SmsMmsMessage message, final boolean replyToThread) {
@@ -1260,7 +1280,8 @@ public class SmsPopupActivity extends FragmentActivity implements SmsPopupButton
         case ButtonListPreference.BUTTON_DISABLED: // Disabled
             break;
         case ButtonListPreference.BUTTON_CLOSE: // Close
-            closeMessage();
+            //closeMessage();
+            closeAllMessages();
             break;
         case ButtonListPreference.BUTTON_DELETE: // Delete
             showDialog(DIALOG_DELETE);

@@ -1,6 +1,7 @@
 package net.everythingandroid.smspopup.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.everythingandroid.smspopup.BuildConfig;
 import net.everythingandroid.smspopup.provider.SmsMmsMessage;
@@ -14,6 +15,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
@@ -24,6 +26,8 @@ public class SmsPopupUtilsService extends WakefulIntentService {
             "net.everythingandroid.smspopup.ACTION_MARK_THREAD_READ";
     public static final String ACTION_MARK_MESSAGE_READ =
             "net.everythingandroid.smspopup.ACTION_MARK_MESSAGE_READ";
+    public static final String ACTION_MARK_ALL_MESSAGES_READ =
+            "net.everythingandroid.smspopup.ACTION_MARK_ALL_MESSAGES_READ";
     public static final String ACTION_DELETE_MESSAGE =
             "net.everythingandroid.smspopup.ACTION_DELETE_MESSAGE";
     public static final String ACTION_UPDATE_NOTIFICATION =
@@ -58,6 +62,17 @@ public class SmsPopupUtilsService extends WakefulIntentService {
             if (BuildConfig.DEBUG) Log.v("SMSPopupUtilsService: Marking message read");
             SmsMmsMessage message = new SmsMmsMessage(this, intent.getExtras());
             message.setMessageRead();
+        } else if (ACTION_MARK_ALL_MESSAGES_READ.equals(action)) {
+            if (BuildConfig.DEBUG) Log.v("SMSPopupUtilsService: Marking all messages read");
+            ArrayList<Bundle> messages = intent.getParcelableArrayListExtra("messages");
+            Iterator iter = messages.iterator();
+
+            SmsMmsMessage message = null;
+
+            while(iter.hasNext()) {
+                message = new SmsMmsMessage(this, (Bundle)iter.next());
+                message.setMessageRead();
+            }
         } else if (ACTION_DELETE_MESSAGE.equals(action)) {
             if (BuildConfig.DEBUG) Log.v("SMSPopupUtilsService: Deleting message");
             SmsMmsMessage message = new SmsMmsMessage(this, intent.getExtras());
